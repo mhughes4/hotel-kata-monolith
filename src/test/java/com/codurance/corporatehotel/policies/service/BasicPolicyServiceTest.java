@@ -1,23 +1,31 @@
 package com.codurance.corporatehotel.policies.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
-
+import com.codurance.corporatehotel.common.model.RoomType;
 import com.codurance.corporatehotel.common.model.RoomTypes;
+import com.codurance.corporatehotel.common.repository.RoomTypeRepository;
 import com.codurance.corporatehotel.companies.model.Company;
 import com.codurance.corporatehotel.companies.model.Employee;
+import com.codurance.corporatehotel.companies.repository.CompanyRepository;
 import com.codurance.corporatehotel.companies.repository.EmployeeRepository;
 import com.codurance.corporatehotel.policies.model.CompanyPolicy;
 import com.codurance.corporatehotel.policies.model.EmployeePolicy;
+import com.codurance.corporatehotel.policies.repository.CompanyPolicyRepository;
 import com.codurance.corporatehotel.policies.repository.EmployeePolicyRepository;
-import java.util.ArrayList;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 class BasicPolicyServiceTest {
 
@@ -25,10 +33,19 @@ class BasicPolicyServiceTest {
   private BasicPolicyService policyService;
 
   @Mock
-  private EmployeePolicyRepository policyRepositoryStub;
+  private EmployeePolicyRepository employeePolicyRepositoryStub;
+
+  @Mock
+  private CompanyPolicyRepository companyPolicyRepositoryStub;
 
   @Mock
   private EmployeeRepository employeeRepositoryStub;
+
+  @Mock
+  private CompanyRepository companyRepository;
+
+  @Mock
+  private RoomTypeRepository roomTypeRepository;
 
   private Integer employeeId;
   private Integer companyId;
@@ -46,12 +63,14 @@ class BasicPolicyServiceTest {
   public void shouldCreateEmployeePolicyForSingleRoomType() throws Exception {
     // given
     roomTypes.add(RoomTypes.STANDARD);
+    given(roomTypeRepository.findByRoomType(any(RoomTypes.class))).willReturn(new RoomType());
+    given(employeeRepositoryStub.findById(employeeId)).willReturn(Optional.of(new Employee()));
 
     // when
     policyService.setEmployeePolicy(employeeId, roomTypes);
 
     // then
-    verify(policyRepositoryStub).persistEmployeePolicy(employeeId, RoomTypes.STANDARD);
+    verify(employeePolicyRepositoryStub).save(any(EmployeePolicy.class));
   }
 
   @Test
@@ -59,25 +78,28 @@ class BasicPolicyServiceTest {
     // given
     roomTypes.add(RoomTypes.STANDARD);
     roomTypes.add(RoomTypes.MASTER_SUITE);
+    given(roomTypeRepository.findByRoomType(any(RoomTypes.class))).willReturn(new RoomType());
+    given(employeeRepositoryStub.findById(employeeId)).willReturn(Optional.of(new Employee()));
 
     // when
     policyService.setEmployeePolicy(employeeId, roomTypes);
 
     // then
-    verify(policyRepositoryStub).persistEmployeePolicy(employeeId, RoomTypes.STANDARD);
-    verify(policyRepositoryStub).persistEmployeePolicy(employeeId, RoomTypes.MASTER_SUITE);
+    verify(employeePolicyRepositoryStub).save(any(EmployeePolicy.class));
   }
 
   @Test
   public void shouldCreateCompanyPolicyForSingleRoomType() throws Exception {
     // given
     roomTypes.add(RoomTypes.STANDARD);
+    given(roomTypeRepository.findByRoomType(any(RoomTypes.class))).willReturn(new RoomType());
+    given(companyRepository.findById(companyId)).willReturn(Optional.of(new Company()));
 
     // when
     policyService.setCompanyPolicy(companyId, roomTypes);
 
     // then
-    verify(policyRepositoryStub).persistCompanyPolicy(companyId, RoomTypes.STANDARD);
+    verify(companyPolicyRepositoryStub).save(any(CompanyPolicy.class));
   }
 
   @Test
@@ -85,54 +107,55 @@ class BasicPolicyServiceTest {
     // given
     roomTypes.add(RoomTypes.STANDARD);
     roomTypes.add(RoomTypes.MASTER_SUITE);
+    given(roomTypeRepository.findByRoomType(any(RoomTypes.class))).willReturn(new RoomType());
+    given(companyRepository.findById(companyId)).willReturn(Optional.of(new Company()));
 
     // when
     policyService.setCompanyPolicy(companyId, roomTypes);
 
     // then
-    verify(policyRepositoryStub).persistCompanyPolicy(companyId, RoomTypes.STANDARD);
-    verify(policyRepositoryStub).persistCompanyPolicy(companyId, RoomTypes.MASTER_SUITE);
+    verify(companyPolicyRepositoryStub).save(any(CompanyPolicy.class));
   }
 
   @Test
   public void shouldUpdateEmployeePolicyGivenItAlreadyExists() throws Exception {
     // when
-    given(policyRepositoryStub.findForEmployee(employeeId)).willReturn(new EmployeePolicy());
+    given(employeePolicyRepositoryStub.findByEmployeeId(employeeId)).willReturn(Optional.of(new EmployeePolicy()));
     roomTypes.add(RoomTypes.STANDARD);
+    given(roomTypeRepository.findByRoomType(any(RoomTypes.class))).willReturn(new RoomType());
 
     // when
     policyService.setEmployeePolicy(employeeId, roomTypes);
 
     // then
-    verify(policyRepositoryStub).updateEmployeePolicy(employeeId, RoomTypes.STANDARD);
+    verify(employeePolicyRepositoryStub, times(0)).save(any(EmployeePolicy.class));
   }
 
   @Test
   public void shouldUpdateCompanyPolicy_givenItAlreadyExists() throws Exception {
     // when
-    given(policyRepositoryStub.findForCompany(companyId)).willReturn(new CompanyPolicy());
+    given(companyPolicyRepositoryStub.findByCompanyId(companyId)).willReturn(Optional.of(new CompanyPolicy()));
     roomTypes.add(RoomTypes.STANDARD);
 
     // when
     policyService.setCompanyPolicy(companyId, roomTypes);
 
     // then
-    verify(policyRepositoryStub).updateCompanyPolicy(companyId, RoomTypes.STANDARD);
+    verify(employeePolicyRepositoryStub, times(0)).save(any(EmployeePolicy.class));
   }
 
   @Test
   public void shouldAllowBooking_givenNoPoliciesExist() throws Exception {
     // when
     RoomTypes roomType = RoomTypes.STANDARD;
-    given(policyRepositoryStub.findForCompany(companyId)).willReturn(null);
-    given(policyRepositoryStub.findForEmployee(employeeId)).willReturn(null);
+    given(companyPolicyRepositoryStub.findByCompanyId(companyId)).willReturn(Optional.empty());
+    given(employeePolicyRepositoryStub.findByEmployeeId(employeeId)).willReturn(Optional.empty());
 
     // when
     boolean isBookingAllowed = policyService.isBookingAllowed(employeeId, roomType);
 
     // then
     assertThat(isBookingAllowed).isTrue();
-
   }
 
   @Test
@@ -140,12 +163,15 @@ class BasicPolicyServiceTest {
     // given
     RoomTypes roomType = RoomTypes.STANDARD;
 
+    Employee employee = new Employee();
+    employee.setId(employeeId);
+
     EmployeePolicy employeePolicy = new EmployeePolicy();
-    employeePolicy.setEmployeeId(employeeId);
+    employeePolicy.setEmployee(employee);
     employeePolicy.addRoomType(RoomTypes.STANDARD);
 
-    given(policyRepositoryStub.findForCompany(companyId)).willReturn(null);
-    given(policyRepositoryStub.findForEmployee(employeeId)).willReturn(employeePolicy);
+    given(companyPolicyRepositoryStub.findByCompanyId(companyId)).willReturn(Optional.empty());
+    given(employeePolicyRepositoryStub.findByEmployeeId(employeeId)).willReturn(Optional.of(employeePolicy));
 
     // when
     boolean isBookingAllowed = policyService.isBookingAllowed(employeeId, roomType);
@@ -159,12 +185,15 @@ class BasicPolicyServiceTest {
     // given
     RoomTypes roomType = RoomTypes.STANDARD;
 
+    Company company = new Company();
+    company.setId(companyId);
+
     CompanyPolicy companyPolicy = new CompanyPolicy();
-    companyPolicy.setCompanyId(companyId);
+    companyPolicy.setCompany(company);
     companyPolicy.addRoomType(RoomTypes.STANDARD);
 
-    given(policyRepositoryStub.findForCompany(companyId)).willReturn(companyPolicy);
-    given(policyRepositoryStub.findForEmployee(employeeId)).willReturn(null);
+    given(companyPolicyRepositoryStub.findByCompanyId(companyId)).willReturn(Optional.of(companyPolicy));
+    given(employeePolicyRepositoryStub.findByEmployeeId(employeeId)).willReturn(Optional.empty());
 
     // when
     boolean isBookingAllowed = policyService.isBookingAllowed(employeeId, roomType);
@@ -178,12 +207,16 @@ class BasicPolicyServiceTest {
     // given
     RoomTypes roomType = RoomTypes.MASTER_SUITE;
 
+
+    Employee employee = new Employee();
+    employee.setId(employeeId);
+
     EmployeePolicy employeePolicy = new EmployeePolicy();
-    employeePolicy.setEmployeeId(employeeId);
+    employeePolicy.setEmployee(employee);
     employeePolicy.addRoomType(RoomTypes.STANDARD);
 
-    given(policyRepositoryStub.findForCompany(companyId)).willReturn(null);
-    given(policyRepositoryStub.findForEmployee(employeeId)).willReturn(employeePolicy);
+    given(companyPolicyRepositoryStub.findByCompanyId(companyId)).willReturn(Optional.empty());
+    given(employeePolicyRepositoryStub.findByEmployeeId(employeeId)).willReturn(Optional.of(employeePolicy));
 
     // when
     boolean isBookingAllowed = policyService.isBookingAllowed(employeeId, roomType);
@@ -198,17 +231,20 @@ class BasicPolicyServiceTest {
     // when
     RoomTypes roomType = RoomTypes.MASTER_SUITE;
 
+    Company company = new Company();
+    company.setId(companyId);
+
+    Employee employee = new Employee();
+    employee.setId(employeeId);
+    employee.setCompany(company);
+
     CompanyPolicy companyPolicy = new CompanyPolicy();
-    companyPolicy.setCompanyId(companyId);
+    companyPolicy.setCompany(company);
     companyPolicy.addRoomType(RoomTypes.STANDARD);
 
-    Company company = new Company(companyId);
-    Employee employee = new Employee(employeeId);
-    employee.setCompanyId(companyId);
-
-    given(policyRepositoryStub.findForCompany(companyId)).willReturn(companyPolicy);
-    given(policyRepositoryStub.findForEmployee(employeeId)).willReturn(null);
-    given(employeeRepositoryStub.findById(employeeId)).willReturn(employee);
+    given(companyPolicyRepositoryStub.findByCompanyId(companyId)).willReturn(Optional.of(companyPolicy));
+    given(employeePolicyRepositoryStub.findByEmployeeId(employeeId)).willReturn(Optional.empty());
+    given(employeeRepositoryStub.findById(employeeId)).willReturn(Optional.of(employee));
 
     // when
     boolean isBookingAllowed = policyService.isBookingAllowed(employeeId, roomType);
@@ -222,21 +258,24 @@ class BasicPolicyServiceTest {
     // given
     RoomTypes roomType = RoomTypes.MASTER_SUITE;
 
+    Company company = new Company();
+    company.setId(companyId);
+
+    Employee employee = new Employee();
+    employee.setId(employeeId);
+    employee.setCompany(company);
+
     CompanyPolicy companyPolicy = new CompanyPolicy();
-    companyPolicy.setCompanyId(companyId);
+    companyPolicy.setCompany(company);
     companyPolicy.addRoomType(RoomTypes.STANDARD);
 
     EmployeePolicy employeePolicy = new EmployeePolicy();
-    employeePolicy.setEmployeeId(employeeId);
+    employeePolicy.setEmployee(employee);
     employeePolicy.addRoomType(RoomTypes.MASTER_SUITE);
 
-    Company company = new Company(companyId);
-    Employee employee = new Employee(employeeId);
-    employee.setCompanyId(companyId);
-
-    given(policyRepositoryStub.findForCompany(companyId)).willReturn(companyPolicy);
-    given(policyRepositoryStub.findForEmployee(employeeId)).willReturn(employeePolicy);
-    given(employeeRepositoryStub.findById(employeeId)).willReturn(employee);
+    given(companyPolicyRepositoryStub.findByCompanyId(companyId)).willReturn(Optional.of(companyPolicy));
+    given(employeePolicyRepositoryStub.findByEmployeeId(employeeId)).willReturn(Optional.of(employeePolicy));
+    given(employeeRepositoryStub.findById(employeeId)).willReturn(Optional.of(employee));
 
     // when
     boolean isBookingAllowed = policyService.isBookingAllowed(employeeId, roomType);

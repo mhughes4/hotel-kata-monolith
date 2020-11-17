@@ -15,6 +15,13 @@ public class RoomType {
     @Enumerated
     private RoomTypes roomType;
 
+    public RoomType() {
+    }
+
+    public RoomType(RoomTypes roomTypes) {
+        this.roomType = roomTypes;
+    }
+
     public Integer getId() {
         return id;
     }

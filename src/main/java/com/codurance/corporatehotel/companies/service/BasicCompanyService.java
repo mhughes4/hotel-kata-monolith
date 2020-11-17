@@ -22,11 +22,11 @@ public class BasicCompanyService implements CompanyService {
   @Autowired
   private EmployeePolicyRepository employeePolicyRepository;
 
-  public void addEmployee(Integer companyId, Integer employeeId) {
+  public Employee addEmployee(Integer companyId, Integer employeeId) {
     Optional<Company> companyOpt = this.companyRepository.findById(companyId);
     Company company = null;
 
-    if (companyOpt.isPresent()) {
+    if (companyOpt.isEmpty()) {
       company = new Company();
       company.setId(companyId);
 
@@ -34,14 +34,19 @@ public class BasicCompanyService implements CompanyService {
     }
 
     Optional<Employee> employeeOpt = this.employeeRepository.findById(employeeId);
+    Employee employeeToReturn = null;
 
-    if (employeeOpt.isPresent()) {
+    if (employeeOpt.isEmpty()) {
       Employee employee = new Employee();
       employee.setId(employeeId);
       employee.setCompany(company);
 
       this.employeeRepository.save(employee);
+    }else{
+      employeeToReturn = employeeOpt.get();
     }
+
+    return employeeToReturn;
   }
 
   public void deleteEmployee(Integer employeeId) {

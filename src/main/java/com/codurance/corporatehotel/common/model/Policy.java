@@ -32,4 +32,8 @@ public class Policy {
   public void setRoomTypes(List<RoomType> roomTypes) {
     this.roomTypes = roomTypes;
   }
+
+  public void addRoomType(RoomTypes standard) {
+    roomTypes.add(new RoomType(standard));
+  }
 }

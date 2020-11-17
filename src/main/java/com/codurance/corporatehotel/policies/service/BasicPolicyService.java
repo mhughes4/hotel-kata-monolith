@@ -86,7 +86,10 @@ public class BasicPolicyService implements PolicyService {
     }
 
     private boolean isPolicySufficient(Policy policy, RoomTypes roomType) {
-        return policy != null && policy.getRoomTypes().contains(roomType);
+        return policy != null
+                && policy.getRoomTypes()
+                        .stream()
+                        .anyMatch(roomTypes -> roomTypes.getRoomType().equals(roomType));
     }
 
     private Optional<CompanyPolicy> findCompanyPolicy(Integer employeeId) {

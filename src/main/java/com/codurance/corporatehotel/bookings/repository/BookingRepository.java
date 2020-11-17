@@ -13,6 +13,7 @@ import java.util.List;
 @Repository
 public interface BookingRepository extends CrudRepository<Booking, Integer> {
 
-  @Query("")
+  // Fixme
+  @Query("from Room")
   List<Room> findAvailableRooms(RoomTypes roomType, LocalDateTime checkIn, LocalDateTime checkOut);
 }

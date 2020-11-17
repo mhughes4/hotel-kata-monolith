@@ -1,11 +1,5 @@
 package com.codurance.corporatehotel.hotels.service;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-
 import com.codurance.corporatehotel.common.model.RoomTypes;
 import com.codurance.corporatehotel.hotels.exception.HotelExistsException;
 import com.codurance.corporatehotel.hotels.model.Hotel;
@@ -17,6 +11,13 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
 
 class BasicHotelServiceTest {
 
@@ -45,13 +46,13 @@ class BasicHotelServiceTest {
     hotelService.addHotel(hotelId, hotelName);
 
     // then
-    verify(hotelRepositoryStub).persist(hotelId, hotelName);
+    verify(hotelRepositoryStub).save(any(Hotel.class));
   }
 
   @Test
   public void shouldNotAddHotel() throws Exception {
     // given
-    doThrow(HotelExistsException.class).when(hotelRepositoryStub).persist(hotelId, hotelName);
+    doThrow(HotelExistsException.class).when(hotelRepositoryStub).save(any(Hotel.class));
 
     // when
     // then
@@ -62,27 +63,26 @@ class BasicHotelServiceTest {
   @Test
   public void shouldSetRoom() throws Exception {
     // given
-    given(hotelRepositoryStub.findById(hotelId)).willReturn(new Hotel());
+    given(hotelRepositoryStub.findById(hotelId)).willReturn(Optional.of(new Hotel()));
 
     // when
     hotelService.setRoom(hotelId, roomNumber, roomType);
 
     // then
-    verify(roomRepositoryStub).persist(hotelId, roomNumber, roomType);
+    verify(roomRepositoryStub).save(any(Room.class));
   }
 
   @Test
   public void shouldUpdateRoom() {
     // given
-    given(hotelRepositoryStub.findById(hotelId)).willReturn(new Hotel());
-    given(roomRepositoryStub.findByHotelAndNumber(hotelId, roomNumber)).willReturn(new Room());
+    given(hotelRepositoryStub.findById(hotelId)).willReturn(Optional.of(new Hotel()));
+    given(roomRepositoryStub.findByHotelIdAndRoomNumber(hotelId, roomNumber)).willReturn(Optional.of(new Room()));
 
     // when
     hotelService.setRoom(hotelId, roomNumber, roomType);
 
     // then
-    verify(roomRepositoryStub).update(hotelId, roomNumber, roomType);
-    verify(roomRepositoryStub, times(0)).persist(hotelId, roomNumber, roomType);
+    verify(roomRepositoryStub, times(0)).save(any(Room.class));
   }
 
 }

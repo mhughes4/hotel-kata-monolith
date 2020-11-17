@@ -1,14 +1,10 @@
 package com.codurance.corporatehotel.companies.service;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-
 import com.codurance.corporatehotel.companies.model.Company;
 import com.codurance.corporatehotel.companies.model.Employee;
 import com.codurance.corporatehotel.companies.repository.CompanyRepository;
 import com.codurance.corporatehotel.companies.repository.EmployeeRepository;
+import com.codurance.corporatehotel.policies.model.EmployeePolicy;
 import com.codurance.corporatehotel.policies.repository.EmployeePolicyRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,6 +13,11 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.Optional;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 class BasicCompanyServiceTest {
 
@@ -30,7 +31,7 @@ class BasicCompanyServiceTest {
   private EmployeeRepository employeeRepository;
 
   @Mock
-  private EmployeePolicyRepository policyRepository;
+  private EmployeePolicyRepository employeePolicyRepository;
 
   private final Integer companyId = 1;
   private final Integer employeeId = 1;
@@ -87,12 +88,13 @@ class BasicCompanyServiceTest {
   public void shouldDeleteEmployee() throws Exception {
     // given
     given(employeeRepository.findById(employeeId)).willReturn(Optional.of(new Employee(employeeId)));
+    given(employeePolicyRepository.findByEmployeeId(employeeId)).willReturn(Optional.of(new EmployeePolicy()));
 
     // when
     companyService.deleteEmployee(employeeId);
 
     // then
-    verify(policyRepository).deleteEmployee(employeeId);
+    verify(employeePolicyRepository).delete(any(EmployeePolicy.class));
     verify(employeeRepository).delete(any(Employee.class));
   }
 

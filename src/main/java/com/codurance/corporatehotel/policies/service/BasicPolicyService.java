@@ -1,78 +1,101 @@
 package com.codurance.corporatehotel.policies.service;
 
 import com.codurance.corporatehotel.common.model.Policy;
+import com.codurance.corporatehotel.common.model.RoomType;
 import com.codurance.corporatehotel.common.model.RoomTypes;
+import com.codurance.corporatehotel.common.repository.RoomTypeRepository;
 import com.codurance.corporatehotel.companies.model.Employee;
+import com.codurance.corporatehotel.companies.repository.CompanyRepository;
 import com.codurance.corporatehotel.companies.repository.EmployeeRepository;
 import com.codurance.corporatehotel.policies.model.CompanyPolicy;
 import com.codurance.corporatehotel.policies.model.EmployeePolicy;
+import com.codurance.corporatehotel.policies.repository.CompanyPolicyRepository;
 import com.codurance.corporatehotel.policies.repository.EmployeePolicyRepository;
-import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+@Service
 public class BasicPolicyService implements PolicyService {
 
-  private final EmployeePolicyRepository policyRepository;
-  private final EmployeeRepository employeeRepository;
+    @Autowired
+    private EmployeePolicyRepository employeePolicyRepository;
 
-  public BasicPolicyService(EmployeePolicyRepository policyRepository,
-                            EmployeeRepository employeeRepository) {
-    this.policyRepository = policyRepository;
-    this.employeeRepository = employeeRepository;
-  }
+    @Autowired
+    private CompanyPolicyRepository companyPolicyRepository;
 
-  public void setEmployeePolicy(Integer employeeId, List<RoomTypes> roomTypes) {
-    roomTypes.forEach(roomType -> {
+    @Autowired
+    private EmployeeRepository employeeRepository;
 
-      EmployeePolicy employeePolicy = this.policyRepository.findForEmployee(employeeId);
+    @Autowired
+    private RoomTypeRepository roomTypeRepository;
 
-      if (employeePolicy != null) {
-        this.policyRepository.updateEmployeePolicy(employeeId, roomType);
-      } else {
-        this.policyRepository.persistEmployeePolicy(employeeId, roomType);
-      }
+    @Autowired
+    private CompanyRepository companyRepository;
 
-    });
-  }
+    public void setEmployeePolicy(Integer employeeId, final List<RoomTypes> roomTypes) {
 
-  public void setCompanyPolicy(Integer companyId, List<RoomTypes> roomTypes) {
-    roomTypes.forEach(roomType -> {
+        List<RoomType> roomTypesToPersist = roomTypes.stream()
+                .map(roomTypeRepository::findByRoomType)
+                .collect(Collectors.toList());
 
-      CompanyPolicy companyPolicy = this.policyRepository.findForCompany(companyId);
+        this.employeePolicyRepository.findByEmployeeId(employeeId).ifPresentOrElse(employeePolicy -> {
+            employeePolicy.setRoomTypes(roomTypesToPersist);
+        }, () -> {
+            EmployeePolicy employeePolicy = new EmployeePolicy();
+            employeePolicy.setEmployee(employeeRepository.findById(employeeId).get());
+            employeePolicy.setRoomTypes(roomTypesToPersist);
 
-      if (companyPolicy != null) {
-        this.policyRepository.updateCompanyPolicy(companyId, roomType);
-      } else {
-        this.policyRepository.persistCompanyPolicy(companyId, roomType);
-      }
-    });
-  }
-
-  public boolean isBookingAllowed(Integer employeeId, RoomTypes roomType) {
-    EmployeePolicy employeePolicy = this.policyRepository.findForEmployee(employeeId);
-
-    if (employeePolicy != null) {
-      return this.isPolicySufficient(employeePolicy, roomType);
-    } else {
-      CompanyPolicy companyPolicy = this.findCompanyPolicy(employeeId);
-      if (companyPolicy != null) {
-        return this.isPolicySufficient(companyPolicy, roomType);
-      }
+            this.employeePolicyRepository.save(employeePolicy);
+        });
     }
 
-    return true;
-  }
+    public void setCompanyPolicy(Integer companyId, List<RoomTypes> roomTypes) {
 
-  private boolean isPolicySufficient(Policy policy, RoomTypes roomType) {
-    return policy != null && policy.getRoomTypes().contains(roomType);
-  }
+        List<RoomType> roomTypesToPersist = roomTypes.stream()
+                .map(roomTypeRepository::findByRoomType)
+                .collect(Collectors.toList());
 
-  private CompanyPolicy findCompanyPolicy(Integer employeeId) {
-    Employee employee = this.employeeRepository.findById(employeeId);
+        this.companyPolicyRepository.findByCompanyId(companyId).ifPresentOrElse(companyPolicy -> {
+            companyPolicy.setRoomTypes(roomTypesToPersist);
+        }, () -> {
+            CompanyPolicy companyPolicy = new CompanyPolicy();
+            companyPolicy.setCompany(companyRepository.findById(companyId).get());
+            companyPolicy.setRoomTypes(roomTypesToPersist);
 
-    if (employee != null) {
-      return this.policyRepository.findForCompany(employee.getCompanyId());
+            this.companyPolicyRepository.save(companyPolicy);
+        });
     }
 
-    return null;
-  }
+    public boolean isBookingAllowed(Integer employeeId, RoomTypes roomType) {
+        Optional<EmployeePolicy> optionalEmployeePolicy = this.employeePolicyRepository.findByEmployeeId(employeeId);
+
+        if (optionalEmployeePolicy.isPresent()) {
+            return this.isPolicySufficient(optionalEmployeePolicy.get(), roomType);
+        } else {
+            Optional<CompanyPolicy> optionalCompanyPolicy = this.findCompanyPolicy(employeeId);
+            if (optionalCompanyPolicy.isPresent()) {
+                return this.isPolicySufficient(optionalCompanyPolicy.get(), roomType);
+            }
+        }
+
+        return true;
+    }
+
+    private boolean isPolicySufficient(Policy policy, RoomTypes roomType) {
+        return policy != null && policy.getRoomTypes().contains(roomType);
+    }
+
+    private Optional<CompanyPolicy> findCompanyPolicy(Integer employeeId) {
+        Optional<Employee> employee = this.employeeRepository.findById(employeeId);
+
+        if (employee.isPresent()) {
+            return this.companyPolicyRepository.findByCompanyId(employee.get().getCompany().getId());
+        }
+
+        return Optional.ofNullable(null);
+    }
 }

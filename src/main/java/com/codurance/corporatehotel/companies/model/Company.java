@@ -15,6 +15,13 @@ public class Company {
   @OneToMany(mappedBy = "company")
   private List<Employee> employees;
 
+  public Company() {
+  }
+
+  public Company(Integer id) {
+    this.id = id;
+  }
+
   public List<Employee> getEmployees() {
     return employees;
   }

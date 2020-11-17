@@ -16,7 +16,14 @@ public class Employee {
   @JoinColumn(name = "company_id")
   private Company company;
 
-  public Integer getId() {
+  public Employee() {
+  }
+
+  public Employee(Integer employeeId) {
+
+  }
+
+    public Integer getId() {
     return id;
   }
 

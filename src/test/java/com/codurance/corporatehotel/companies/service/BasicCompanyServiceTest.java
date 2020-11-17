@@ -16,6 +16,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.Optional;
+
 class BasicCompanyServiceTest {
 
   @InjectMocks
@@ -43,20 +45,20 @@ class BasicCompanyServiceTest {
     // when
     companyService.addEmployee(companyId, employeeId);
     // then
-    verify(companyRepository).persist(any(Company.class));
+    verify(companyRepository).save(any(Company.class));
   }
 
   @Test
   public void shouldAddEmployeeWithoutAddingCompany() throws Exception {
     // given
-    given(companyRepository.findById(companyId)).willReturn(new Company(companyId));
+    given(companyRepository.findById(companyId)).willReturn(Optional.of(new Company(companyId)));
 
     // when
     companyService.addEmployee(companyId, employeeId);
 
     // then
-    verify(companyRepository, times(0)).persist(any(Company.class));
-    verify(employeeRepository).persist(any(Employee.class));
+    verify(companyRepository, times(0)).save(any(Company.class));
+    verify(employeeRepository).save(any(Employee.class));
   }
 
   @Test
@@ -65,33 +67,33 @@ class BasicCompanyServiceTest {
     // when
     companyService.addEmployee(companyId, employeeId);
     // then
-    verify(employeeRepository).persist(any(Employee.class));
+    verify(employeeRepository).save(any(Employee.class));
   }
 
   @Test
   public void shouldNotAddEmployee_givenAlreadyExistsInTheSameCompany() throws Exception {
     // given
-    given(companyRepository.findById(companyId)).willReturn(new Company(companyId));
-    given(employeeRepository.findById(employeeId)).willReturn(new Employee(employeeId));
+    given(companyRepository.findById(companyId)).willReturn(Optional.of(new Company(companyId)));
+    given(employeeRepository.findById(employeeId)).willReturn(Optional.of(new Employee(employeeId)));
 
     // when
     companyService.addEmployee(companyId, employeeId);
 
     // then
-    verify(employeeRepository, times(0)).persist(any(Employee.class));
+    verify(employeeRepository, times(0)).save(any(Employee.class));
   }
 
   @Test
   public void shouldDeleteEmployee() throws Exception {
     // given
-    given(employeeRepository.findById(employeeId)).willReturn(new Employee(employeeId));
+    given(employeeRepository.findById(employeeId)).willReturn(Optional.of(new Employee(employeeId)));
 
     // when
     companyService.deleteEmployee(employeeId);
 
     // then
     verify(policyRepository).deleteEmployee(employeeId);
-    verify(employeeRepository).delete(employeeId);
+    verify(employeeRepository).delete(any(Employee.class));
   }
 
   @Test
@@ -100,6 +102,6 @@ class BasicCompanyServiceTest {
     companyService.deleteEmployee(employeeId);
 
     // then
-    verify(employeeRepository, times(0)).delete(employeeId);
+    verify(employeeRepository, times(0)).delete(any(Employee.class));
   }
 }

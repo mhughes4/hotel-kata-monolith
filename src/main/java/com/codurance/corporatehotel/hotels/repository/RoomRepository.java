@@ -1,13 +1,13 @@
 package com.codurance.corporatehotel.hotels.repository;
 
-import com.codurance.corporatehotel.common.model.RoomTypes;
 import com.codurance.corporatehotel.hotels.model.Room;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 
-public interface RoomRepository {
+import java.util.Optional;
 
-  void persist(Integer hotelId, Integer roomNumber, RoomTypes roomType);
+@Repository
+public interface RoomRepository extends CrudRepository<Room, Integer> {
 
-  Room findByHotelAndNumber(Integer hotelId, Integer roomNumber);
-
-  void update(Integer hotelId, Integer roomNumber, RoomTypes roomType);
+  Optional<Room> findByHotelIdAndRoomNumber(Integer hotelId, Integer roomNumber);
 }

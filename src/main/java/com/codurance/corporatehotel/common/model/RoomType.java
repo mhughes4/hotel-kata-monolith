@@ -13,7 +13,7 @@ public class RoomType {
     private Integer id;
 
     @Enumerated
-    private RoomTypes roomTypes;
+    private RoomTypes roomType;
 
     public Integer getId() {
         return id;
@@ -23,11 +23,11 @@ public class RoomType {
         this.id = id;
     }
 
-    public RoomTypes getRoomTypes() {
-        return roomTypes;
+    public RoomTypes getRoomType() {
+        return roomType;
     }
 
-    public void setRoomTypes(RoomTypes roomTypes) {
-        this.roomTypes = roomTypes;
+    public void setRoomType(RoomTypes roomTypes) {
+        this.roomType = roomTypes;
     }
 }

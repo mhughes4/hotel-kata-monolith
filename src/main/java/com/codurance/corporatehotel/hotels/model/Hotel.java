@@ -7,7 +7,6 @@ import java.util.List;
 public class Hotel {
 
   @Id
-  @GeneratedValue
   private Integer id;
 
   @Version

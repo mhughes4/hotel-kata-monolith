@@ -20,7 +20,7 @@ public class BasicCompanyService implements CompanyService {
   private EmployeeRepository employeeRepository;
 
   @Autowired
-  private EmployeePolicyRepository policyRepository;
+  private EmployeePolicyRepository employeePolicyRepository;
 
   public void addEmployee(Integer companyId, Integer employeeId) {
     Optional<Company> companyOpt = this.companyRepository.findById(companyId);
@@ -47,7 +47,11 @@ public class BasicCompanyService implements CompanyService {
   public void deleteEmployee(Integer employeeId) {
     this.employeeRepository.findById(employeeId).ifPresent((employee) ->{
       this.employeeRepository.delete(employee);
-      this.policyRepository.deleteEmployee(employeeId);
+
+      employeePolicyRepository.findByEmployeeId(employeeId).ifPresent((employeePolicy -> {
+        this.employeePolicyRepository.delete(employeePolicy);
+      }));
+
     });
   }
 }

@@ -1,29 +1,30 @@
 package com.codurance.corporatehotel.bookings.service;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-
 import com.codurance.corporatehotel.bookings.exception.InsufficientPolicyException;
 import com.codurance.corporatehotel.bookings.exception.NoRoomAvailableException;
 import com.codurance.corporatehotel.bookings.model.Booking;
 import com.codurance.corporatehotel.bookings.repository.BookingRepository;
-import com.codurance.corporatehotel.hotels.exception.HotelNotExistsException;
 import com.codurance.corporatehotel.common.model.RoomTypes;
+import com.codurance.corporatehotel.hotels.exception.HotelNotExistsException;
 import com.codurance.corporatehotel.hotels.model.Hotel;
 import com.codurance.corporatehotel.hotels.service.HotelService;
 import com.codurance.corporatehotel.policies.service.PolicyService;
 import com.codurance.corporatehotel.utils.IdGenerator;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 class BasicBookingServiceTest {
 
@@ -68,7 +69,7 @@ class BasicBookingServiceTest {
     bookingService.book(employeeId, hotelId, roomType, checkIn, checkOut);
 
     // then
-    verify(bookingRepositoryStub).persist(any(Booking.class));
+    verify(bookingRepositoryStub).save(any(Booking.class));
   }
 
   @Test
@@ -83,7 +84,7 @@ class BasicBookingServiceTest {
         employeeId, hotelId, roomType, checkIn, checkOut))
         .isInstanceOf(InsufficientPolicyException.class);
 
-    verify(bookingRepositoryStub, times(0)).persist(any(Booking.class));
+    verify(bookingRepositoryStub, times(0)).save(any(Booking.class));
   }
 
   @Test
@@ -99,7 +100,7 @@ class BasicBookingServiceTest {
         employeeId, hotelId, roomType, checkIn, checkOut))
         .isInstanceOf(NoRoomAvailableException.class);
 
-    verify(bookingRepositoryStub, times(0)).persist(any(Booking.class));
+    verify(bookingRepositoryStub, times(0)).save(any(Booking.class));
   }
 
   @Test
@@ -112,6 +113,6 @@ class BasicBookingServiceTest {
     assertThatThrownBy(() -> bookingService.book(
         employeeId, hotelId, roomType, checkIn, checkOut))
         .isInstanceOf(HotelNotExistsException.class);
-    verify(bookingRepositoryStub, times(0)).persist(any(Booking.class));
+    verify(bookingRepositoryStub, times(0)).save(any(Booking.class));
   }
 }

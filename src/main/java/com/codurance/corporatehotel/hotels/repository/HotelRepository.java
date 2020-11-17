@@ -1,10 +1,9 @@
 package com.codurance.corporatehotel.hotels.repository;
 
 import com.codurance.corporatehotel.hotels.model.Hotel;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 
-public interface HotelRepository {
-
-  void persist(Integer hotelId, String hotelName);
-
-  Hotel findById(Integer hotelId);
+@Repository
+public interface HotelRepository extends CrudRepository<Hotel, Integer> {
 }

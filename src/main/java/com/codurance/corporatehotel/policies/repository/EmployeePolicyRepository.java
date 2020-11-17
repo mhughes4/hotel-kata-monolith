@@ -1,25 +1,15 @@
 package com.codurance.corporatehotel.policies.repository;
 
-import com.codurance.corporatehotel.common.model.RoomTypes;
-import com.codurance.corporatehotel.policies.model.CompanyPolicy;
 import com.codurance.corporatehotel.policies.model.EmployeePolicy;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Optional;
+
 @Repository
-public interface EmployeePolicyRepository extends CrudRepository<> {
+public interface EmployeePolicyRepository extends JpaRepository<EmployeePolicy, Integer> {
 
-  void persistEmployeePolicy(Integer employeeId, RoomTypes roomType);
-
-  void persistCompanyPolicy(Integer companyId, RoomTypes roomType);
-
-  EmployeePolicy findForEmployee(Integer employeeId);
-
-  void updateEmployeePolicy(Integer employeeId, RoomTypes roomType);
-
-  CompanyPolicy findForCompany(Integer companyId);
-
-  void updateCompanyPolicy(Integer companyId, RoomTypes roomType);
-
-  void deleteEmployee(Integer employeeId);
+  Optional<EmployeePolicy> findByEmployeeId(Integer employeeId);
 }

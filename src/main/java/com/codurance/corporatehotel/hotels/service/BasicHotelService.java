@@ -7,6 +7,7 @@ import com.codurance.corporatehotel.hotels.repository.HotelRepository;
 import com.codurance.corporatehotel.hotels.repository.RoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class BasicHotelService implements HotelService {
@@ -20,22 +21,34 @@ public class BasicHotelService implements HotelService {
     this.roomRepository = roomRepository;
   }
 
+  @Transactional
   public void addHotel(Integer hotelId, String hotelName) {
-    this.hotelRepository.persist(hotelId, hotelName);
+    Hotel hotel = new Hotel();
+    hotel.setId(hotelId);
+    hotel.setName(hotelName);
+
+    this.hotelRepository.save(hotel);
   }
 
+  @Transactional(readOnly = true)
   public void setRoom(Integer hotelId, Integer roomNumber, RoomTypes roomType) {
-    if (this.hotelRepository.findById(hotelId) != null) {
-      Room room = this.roomRepository.findByHotelAndNumber(hotelId, roomNumber);
-      if (room != null) {
-        this.roomRepository.update(hotelId, roomNumber, roomType);
-      } else {
-        this.roomRepository.persist(hotelId, roomNumber, roomType);
-      }
-    }
+    this.hotelRepository.findById(hotelId).ifPresent(hotel -> {
+      this.roomRepository.findByHotelIdAndRoomNumber(hotelId, roomNumber).ifPresentOrElse(room -> {
+        room.setRoomNumber(roomNumber);
+        room.setRoomType(roomType);
+      }, () ->{
+        Room room = new Room();
+        room.setRoomNumber(roomNumber);
+        room.setRoomType(roomType);
+        room.setHotel(hotelRepository.findById(hotelId).get());
+
+        this.roomRepository.save(room);
+      });
+    });
   }
 
   public Hotel findHotelById(Integer hotelId) {
-    return this.hotelRepository.findById(hotelId);
+
+    return this.hotelRepository.findById(hotelId).get();
   }
 }

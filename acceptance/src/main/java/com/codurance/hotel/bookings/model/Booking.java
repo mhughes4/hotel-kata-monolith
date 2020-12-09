@@ -1,7 +1,7 @@
-package com.codurance.corporatehotel.bookings.model;
+package com.codurance.hotel.bookings.model;
 
-import com.codurance.corporatehotel.common.model.RoomTypes;
-import com.codurance.corporatehotel.hotels.model.Hotel;
+import com.codurance.hotel.common.model.RoomTypes;
+import com.codurance.hotel.hotels.model.Hotel;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;

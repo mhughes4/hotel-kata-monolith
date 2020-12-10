@@ -41,6 +41,10 @@ public class Booking {
     return hotel;
   }
 
+  public Integer getHotelId() {
+    return hotel.getId();
+  }
+
   public void setHotel(Hotel hotel) {
     this.hotel = hotel;
   }

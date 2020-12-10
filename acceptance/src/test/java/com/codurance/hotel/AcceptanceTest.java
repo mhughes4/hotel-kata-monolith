@@ -1,4 +1,4 @@
-package com.codurance.hotel;
+//package com.codurance.hotel;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -35,50 +35,50 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
-public class AcceptanceTest {
-
-  private IdGenerator idGenerator;
-  @Autowired
-  private HotelService hotelService;
-  @Autowired
-  private CompanyService companyService;
-  @Autowired
-  private BookingService bookingService;
-  @Autowired
-  private PolicyService policyService;
-
-  @Autowired
-  private HotelRepository hotelRepository;
-  @Autowired
-  private RoomRepository roomRepository;
-  @Autowired
-  private CompanyRepository companyRepository;
-  @Autowired
-  private EmployeeRepository employeeRepository;
-  @Autowired
-  private EmployeePolicyRepository policyRepository;
-  @Autowired
-  private BookingRepository bookingRepository;
-
-  Integer hotelId = 1;
-  Integer employeeId = 2;
-  Integer roomNumber = 1;
-  Integer companyId = 10;
-  List<RoomTypes> roomTypes;
-  RoomTypes standardRoomType = RoomTypes.STANDARD;
-  RoomTypes masterRoomType = RoomTypes.MASTER_SUITE;
-  LocalDateTime checkIn = LocalDateTime
-      .parse("2020-01-01 10:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-  LocalDateTime checkOut = LocalDateTime
-      .parse("2020-01-10 10:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-  String hotelName = "Mariott - London";
-
-  @BeforeEach
-  private void init() {
-    idGenerator = new IdGenerator();
+//@SpringBootTest
+//@ActiveProfiles("test")
+//@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
+//public class AcceptanceTest {
+//
+//  private IdGenerator idGenerator;
+//  @Autowired
+//  private HotelService hotelService;
+//  @Autowired
+//  private CompanyService companyService;
+//  @Autowired
+//  private BookingService bookingService;
+//  @Autowired
+//  private PolicyService policyService;
+//
+//  @Autowired
+//  private HotelRepository hotelRepository;
+//  @Autowired
+//  private RoomRepository roomRepository;
+//  @Autowired
+//  private CompanyRepository companyRepository;
+//  @Autowired
+//  private EmployeeRepository employeeRepository;
+//  @Autowired
+//  private EmployeePolicyRepository policyRepository;
+//  @Autowired
+//  private BookingRepository bookingRepository;
+//
+//  Integer hotelId = 1;
+//  Integer employeeId = 2;
+//  Integer roomNumber = 1;
+//  Integer companyId = 10;
+//  List<RoomTypes> roomTypes;
+//  RoomTypes standardRoomType = RoomTypes.STANDARD;
+//  RoomTypes masterRoomType = RoomTypes.MASTER_SUITE;
+//  LocalDateTime checkIn = LocalDateTime
+//      .parse("2020-01-01 10:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+//  LocalDateTime checkOut = LocalDateTime
+//      .parse("2020-01-10 10:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+//  String hotelName = "Mariott - London";
+//
+//  @BeforeEach
+//  private void init() {
+//    idGenerator = new IdGenerator();
     // hotelRepository = new HotelRepository();
     // roomRepository = new RoomRepository();
     // policyRepository = new PolicyRepository();
@@ -92,39 +92,39 @@ public class AcceptanceTest {
     // bookingService = new BasicBookingService(idGenerator,
     //     bookingRepository, policyService, hotelService);
 
-    roomTypes = new ArrayList<>();
-  }
+//    roomTypes = new ArrayList<>();
+//  }
 
-  @Test
-  public void shouldBookingContainAllExpectedData() throws Exception {
-    // given
-    hotelService.addHotel(hotelId, hotelName);
-    hotelService.setRoom(hotelId, roomNumber, standardRoomType);
+//  @Test
+//  public void shouldBookingContainAllExpectedData() throws Exception {
+//    // given
+//    hotelService.addHotel(hotelId, hotelName);
+//    hotelService.setRoom(hotelId, roomNumber, standardRoomType);
+//
+//    // when
+//    Booking booking = bookingService.book(employeeId, hotelId, standardRoomType, checkIn, checkOut);
+//
+//    // then
+//    assertThat(booking.getEmployeeId()).isEqualTo(employeeId);
+//    assertThat(booking.getHotelId()).isEqualTo(hotelId);
+//    assertThat(booking.getRoomType()).isEqualTo(standardRoomType);
+//    assertThat(booking.getCheckIn()).isEqualTo(checkIn);
+//    assertThat(booking.getCheckOut()).isEqualTo(checkOut);
+//  }
 
-    // when
-    Booking booking = bookingService.book(employeeId, hotelId, standardRoomType, checkIn, checkOut);
-
-    // then
-    assertThat(booking.getEmployeeId()).isEqualTo(employeeId);
-    assertThat(booking.getHotelId()).isEqualTo(hotelId);
-    assertThat(booking.getRoomType()).isEqualTo(standardRoomType);
-    assertThat(booking.getCheckIn()).isEqualTo(checkIn);
-    assertThat(booking.getCheckOut()).isEqualTo(checkOut);
-  }
-
-  @Test
-  public void shouldAllowBooking_givenEmployeeWasDeleted() throws Exception {
-    // Given
-    Employee employee = companyService.addEmployee(companyId, employeeId);
-    roomTypes.add(standardRoomType);
-    policyService.setEmployeePolicy(employeeId, roomTypes);
-
-    // When
-    companyService.deleteEmployee(employee.getId());
-
-    // Then
-    assertThat(policyService.isBookingAllowed(employeeId, standardRoomType)).isTrue();
-  }
+//  @Test
+//  public void shouldAllowBooking_givenEmployeeWasDeleted() throws Exception {
+//    // Given
+//    Employee employee = companyService.addEmployee(companyId, employeeId);
+//    roomTypes.add(standardRoomType);
+//    policyService.setEmployeePolicy(employeeId, roomTypes);
+//
+//    // When
+//    companyService.deleteEmployee(employee.getId());
+//
+//    // Then
+//    assertThat(policyService.isBookingAllowed(employeeId, standardRoomType)).isTrue();
+//  }
 
   // @Test
   // public void shouldFindHotelAfterAdding() throws Exception {
@@ -198,4 +198,4 @@ public class AcceptanceTest {
   //       () -> bookingService.book(employeeId, hotelId, masterRoomType, checkIn, checkOut))
   //       .isInstanceOf(InsufficientPolicyException.class);
   // }
-}
+//}

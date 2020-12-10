@@ -8,10 +8,10 @@
     </parent>
 
     <groupId>com.codurance.hotel</groupId>
-    <artifactId>acceptance</artifactId>
+    <artifactId>hotels</artifactId>
     <version>1.0-SNAPSHOT</version>
 
-    <name>acceptance</name>
+    <name>hotels</name>
         <!-- FIXME change it to the project's website -->
     <url>http://www.example.com</url>
 
@@ -88,11 +88,6 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>3.10</version>
-        </dependency>
-        <dependency>
-            <groupId>com.codurance.hotel</groupId>
-            <artifactId>hotels</artifactId>
-            <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
     <build>

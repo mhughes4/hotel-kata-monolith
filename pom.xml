@@ -102,6 +102,7 @@
   </build>
 
     <modules>
+        <module>hotels</module>
         <module>acceptance</module>
     </modules>
 

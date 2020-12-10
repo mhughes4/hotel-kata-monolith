@@ -16,9 +16,10 @@
   <name>corporatehotel</name>
   <description>Demo project for Spring Boot</description>
 
-  <properties>
-    <java.version>12</java.version>
-  </properties>
+    <modules>
+        <module>acceptance</module>
+        <module>hotels</module>
+    </modules>
 
   <dependencies>
     <dependency>
@@ -91,20 +92,5 @@
       <version>3.10</version>
     </dependency>
   </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-maven-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
-
-    <modules>
-        <module>hotels</module>
-        <module>acceptance</module>
-    </modules>
-
 </project>
 
